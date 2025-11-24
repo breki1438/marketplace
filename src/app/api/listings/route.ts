@@ -1,24 +1,37 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
-    const listings = await prisma.listing.findMany({
-        include: { user: true },
-    });
-    return NextResponse.json(listings);
-}
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const categorySlug = searchParams.get("category");
+    const subCategorySlug = searchParams.get("subcategory");
+    const searchQuery = searchParams.get("search"); // 1. Get search param
 
-export async function POST(request: Request) {
-    const { title, price, imageUrl, userId } = await request.json();
+    const whereClause: any = {};
 
-    const listing = await prisma.listing.create({
-        data: {
-            title,
-            price: parseFloat(price),
-            imageUrl,
-            userId,
-        },
-    });
+    if (categorySlug) {
+        whereClause.category = { slug: categorySlug };
+    }
 
-    return NextResponse.json(listing);
+    if (subCategorySlug) {
+        whereClause.subCategory = { slug: subCategorySlug };
+    }
+
+    // 2. Add Search Logic
+    if (searchQuery) {
+        whereClause.title = {
+            contains: searchQuery,
+            mode: 'insensitive' // Case-insensitive search (Postgres specific)
+        };
+    }
+
+    try {
+        const listings = await prisma.listing.findMany({
+            where: whereClause,
+            orderBy: { id: 'desc' }
+        });
+        return NextResponse.json(listings);
+    } catch (error) {
+        return NextResponse.json({ error: "Error fetching listings" }, { status: 500 });
+    }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 
 export default function CategoryList() {
     const categoryList = [
@@ -14,6 +15,19 @@ export default function CategoryList() {
         "Zdrowie i Uroda",
         "Gastronomia"
     ];
+
+    const createSlug = (text: string) => {
+        return text
+            .toString()
+            .toLowerCase()
+            .replace(/ł/g, 'l')
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
+    };
 
     const submenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -78,27 +92,30 @@ export default function CategoryList() {
                 </div>
             </div>
 
-            {/* Submenu */}
             {activeCategory && subcategories[activeCategory] && menuPosition && (
                 <div
                     ref={submenuRef}
                     className="absolute bg-[#2C2628] border border-[#F7F4F3] rounded-lg shadow-lg p-4 z-50"
                     style={{ top: menuPosition.y, left: menuPosition.x }}
                 >
-                    <ul>
-                        <li className="hover:text-blue-400 text-white cursor-pointer py-1">
-                            {">"} Wszystkie ogłoszenia w <span className="font-semibold">{activeCategory}</span>
-                        </li>
-
-                        {/* Physical white separator */}
+                    <ul className="flex flex-col gap-1"> {/* Added flex for better spacing */}
+                        <Link href={`/kategoria/${createSlug(activeCategory)}`}>
+                            <li className="hover:text-blue-400 text-white cursor-pointer py-1">
+                                {">"} Wszystkie ogłoszenia w <span className="font-semibold">{activeCategory}</span>
+                            </li>
+                        </Link>
                         <li>
                             <div className="w-full h-px bg-white my-2" />
                         </li>
-
                         {subcategories[activeCategory].map((sub, i) => (
-                            <li key={i} className="hover:text-blue-400 text-white cursor-pointer py-1">
-                                {">"} {sub}
-                            </li>
+                            <Link
+                                key={i}
+                                href={`/kategoria/${createSlug(activeCategory)}/${createSlug(sub)}`}
+                            >
+                                <li className="hover:text-blue-400 text-white cursor-pointer py-1">
+                                    {">"} {sub}
+                                </li>
+                            </Link>
                         ))}
                     </ul>
                 </div>

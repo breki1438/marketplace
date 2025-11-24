@@ -15,13 +15,41 @@ datasource db {
 }
 
 model Listing {
-  id      Int     @id @default(autoincrement())
-  title    String
-  price   Float
-  userId  String
-  imageUrl String?
-  user    User    @relation(fields: [userId], references: [id])
-  favouritedBy Favourite[]
+  id            Int     @id @default(autoincrement())
+  title         String
+  price         Float
+  userId        String
+  imageUrl      String?
+  user          User    @relation(fields: [userId], references: [id])
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id])
+  subCategoryId String?
+  subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
+  favouritedBy  Favourite[]
+
+  @@map("listings")
+}
+
+model Category {
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  icon          String?
+  listings      Listing[]
+  subcategories SubCategory[]
+
+  @@map("categories")
+}
+
+model SubCategory {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String    @unique
+  categoryId String
+  category   Category  @relation(fields: [categoryId], references: [id])
+  listings   Listing[]
+
+  @@map("subcategories")
 }
 
 model User {
@@ -32,7 +60,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  listings Listing[]
+  listings      Listing[]
   favourites    Favourite[]
 
   @@map("users")
