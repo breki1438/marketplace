@@ -108,7 +108,6 @@ export default async function ListingPage({ params }: Props) {
                     <div className="bg-[#3A3335] p-6 rounded-xl border border-[#4A4345] shadow-xl">
                         <h2 className="text-xl font-bold mb-4 border-b border-gray-600 pb-2">Opis</h2>
                         <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
-                            {/* TODO: Dodać pole 'description' do modelu Prisma. Na razie placeholder. */}
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                             Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                             To jest przykładowy opis, ponieważ w bazie danych jeszcze nie ma pola description.
