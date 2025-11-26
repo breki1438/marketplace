@@ -1,19 +1,26 @@
-// src/app/api/user-favourites/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
+export const dynamic = 'force-dynamic';
 
-    if (!userId) {
-        return NextResponse.json({ error: "Brak userId." }, { status: 400 });
+export async function GET() {
+    try {
+        const session = await getServerSession(authOptions);
+
+        if (!session?.user?.id) {
+            return NextResponse.json([]);
+        }
+
+        const favourites = await prisma.favourite.findMany({
+            where: { userId: session.user.id },
+            select: { listingId: true },
+        });
+
+        return NextResponse.json(favourites);
+    } catch (error) {
+        console.error("[API_USER_FAVOURITES]", error);
+        return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
-
-    const favourites = await prisma.favourite.findMany({
-        where: { userId },
-        select: { listingId: true },
-    });
-
-    return NextResponse.json(favourites);
 }

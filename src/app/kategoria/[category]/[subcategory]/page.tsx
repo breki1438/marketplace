@@ -1,4 +1,6 @@
-import ListingList from "@/app/components/ListingList";
+import ListingList from "@/components/ListingList";
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
 
 interface PageProps {
     params: Promise<{ category: string; subcategory: string }>;
@@ -7,13 +9,34 @@ interface PageProps {
 export default async function SubCategoryPage({ params }: PageProps) {
     const { category, subcategory } = await params;
 
+    const subCategoryData = await prisma.subCategory.findUnique({
+        where: { slug: subcategory },
+        include: {
+            category: true
+        }
+    });
+
+    if (!subCategoryData) {
+        return notFound();
+    }
+
+    const initialListings = await prisma.listing.findMany({
+        where: {
+            category: { slug: category },
+            subCategory: { slug: subcategory }
+        },
+        orderBy: { id: 'desc' }
+    });
+
     return (
         <main>
-            <h1 className="text-white text-3xl text-center font-bold uppercase">
-                {subcategory.replace(/-/g, ' ')}
-            </h1>
-            {/* Pass both slugs */}
-            <ListingList categorySlug={category} subcategorySlug={subcategory} />
+            <ListingList
+                categorySlug={category}
+                subcategorySlug={subcategory}
+                categoryName={subCategoryData.category.name}
+                subcategoryName={subCategoryData.name}
+                initialListings={initialListings}
+            />
         </main>
     );
 }

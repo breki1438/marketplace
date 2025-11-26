@@ -1,5 +1,6 @@
+import ListingList from "@/components/ListingList";
 import { prisma } from "@/lib/prisma";
-import ListingList from "@/app/components/ListingList";
+import { notFound} from "next/navigation";
 
 interface PageProps {
     params: Promise<{ category: string }>;
@@ -7,14 +8,24 @@ interface PageProps {
 
 export default async function CategoryPage({ params }: PageProps) {
     const { category } = await params;
+    const categoryData = await prisma.category.findUnique({
+        where: { slug: category }
+    });
+
+    if (!categoryData) {
+        return notFound();
+    }
+
+    const initialListings = await prisma.listing.findMany({
+        where: {
+            category: {slug: category}
+        },
+        orderBy: { id: 'desc' }
+    });
 
     return (
         <main>
-            <h1 className="text-white text-3xl text-center font-bold uppercase">
-                {category.replace(/-/g, ' ')}
-            </h1>
-            {/* Pass only category slug */}
-            <ListingList categorySlug={category} />
+            <ListingList categorySlug={category} categoryName={categoryData.name} initialListings={initialListings} />
         </main>
     );
 }

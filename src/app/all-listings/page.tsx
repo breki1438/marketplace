@@ -1,11 +1,16 @@
-import ListingList from "@/app/components/ListingList";
+import ListingList from "@/components/ListingList";
+import { prisma } from "@/lib/prisma"; // Import Prisma
 
-export default function AllListingsPage() {
+export default async function AllListingsPage() {
+    const initialListings = await prisma.listing.findMany({
+        orderBy: {
+            id: 'desc'
+        }
+    });
+
     return (
         <main>
-            <h1 className="text-white text-3xl text-center font-bold">Wszystkie ogłoszenia</h1>
-            {/* No props passed, so it fetches everything */}
-            <ListingList />
+            <ListingList initialListings={initialListings} />
         </main>
     );
 }
