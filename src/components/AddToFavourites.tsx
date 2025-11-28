@@ -54,14 +54,18 @@ export default function AddToFavourites({listingId, userId, isFavourite: initial
                 body: JSON.stringify({ listingId }),
             });
 
-            if (!res.ok) throw new Error("Błąd API");
-
-            router.refresh();
+            if (res.ok) {
+                router.refresh();
+            } else {
+                console.error("Błąd API: status", res.status);
+                setIsFavourite(previousState);
+                alert("Nie udało się zaktualizować ulubionych. Spróbuj ponownie.");
+            }
 
         } catch (error) {
-            console.error("Błąd dodawania do ulubionych:", error);
+            console.error("Błąd sieci:", error);
             setIsFavourite(previousState);
-            alert("Nie udało się zaktualizować ulubionych. Spróbuj ponownie.");
+            alert("Błąd połączenia. Spróbuj ponownie.");
         } finally {
             setIsLoading(false);
         }

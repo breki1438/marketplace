@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Upewnij się, że ścieżka jest poprawna
+import { authOptions } from "@/lib/auth"; // Upewnij się, że ścieżka jest poprawna
 
 export async function POST(req: NextRequest) {
     try {
