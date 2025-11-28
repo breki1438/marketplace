@@ -42,6 +42,7 @@ export default function ListingList({
 
     useEffect(() => {
         if (!searchQuery && listings.length > 0 && listings === initialListings) {
+            return;
         }
 
         async function fetchListings() {
@@ -58,11 +59,9 @@ export default function ListingList({
                     const data = await res.json();
                     setListings(data);
                 } else {
-                    console.error("Server error");
                     setListings([]);
                 }
             } catch (error) {
-                console.error("Error fetching listings:", error);
                 setListings([]);
             } finally {
                 setIsLoading(false);
@@ -88,7 +87,7 @@ export default function ListingList({
                     setQuickAccessItems(categorySlug ? (data.subcategories || []) : data);
                 }
             } catch (error) {
-                console.error("Error fetching nav items:", error);
+                console.error(error);
             }
         }
         fetchNavigationItems();
@@ -107,7 +106,7 @@ export default function ListingList({
                     setFavouritesIds(data.map((fav: any) => fav.listingId));
                 }
             } catch (error) {
-                console.error("Error fetching favourites", error);
+                console.error(error);
             }
         }
         fetchFavourites();
@@ -137,7 +136,7 @@ export default function ListingList({
     }, [listings, minPriceFilter, maxPriceFilter, sortMode]);
 
     return (
-        <div className="flex flex-col items-center bg-[#2C2628] py-5 z-0 w-full max-w-6xl mx-auto min-h-screen">
+        <div className="flex flex-col items-center bg-[#2C2628] py-5 z-0 w-full max-w-6xl mx-auto min-h-screen px-4">
 
             <ListingFilter
                 onFilterChange={(min, max, search) => {
@@ -219,7 +218,7 @@ export default function ListingList({
             ) : processedListings.length === 0 ? (
                 <p className="text-white mt-10 text-lg">Brak ogłoszeń spełniających kryteria.</p>
             ) : (
-                <div className="w-full flex flex-col items-center">
+                <div className="w-full flex flex-col items-center gap-4 sm:gap-6">
                     {processedListings.map((listing) => (
                         <ListingCard
                             key={listing.id}

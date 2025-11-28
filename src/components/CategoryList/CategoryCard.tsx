@@ -1,23 +1,30 @@
+import React from "react";
+import { getCategoryIconUrl } from "@/lib/utils";
+
 interface CategoryCardProps {
-    category: string;
+    categoryName: string;
+    iconName: string | null;
     onClick: (e: React.MouseEvent) => void;
 }
 
-export default function CategoryCard({ category, onClick }: CategoryCardProps) {
+export default function CategoryCard({ categoryName, iconName, onClick }: CategoryCardProps) {
+    const iconUrl = getCategoryIconUrl(iconName);
+
     return (
         <div
             onClick={onClick}
-            className="flex-row items-center justify-center m-auto text-center rounded-full cursor-pointer"
+            className="group flex flex-col items-center justify-center cursor-pointer transition-transform duration-300 hover:-translate-y-2"
         >
-            <div className="bg-[#F7F4F3] w-20 h-20 rounded-full hover:bg-[#1EA6D8] transition-colors m-auto mb-3 drop-shadow-2xl">
+            <div className="bg-[#F7F4F3] w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 group-hover:bg-[#1EA6D8] group-hover:shadow-[#1EA6D8]/50 mb-3 overflow-hidden">
                 <img
-                    src={`/images/categories/${category.toLowerCase()}.png`}
-                    alt={category}
-                    className="w-12 h-12 mx-auto mt-2"
+                    src={iconUrl}
+                    alt={categoryName}
+                    className="w-3/4 h-3/4 object-contain transition-transform duration-300 group-hover:scale-110"
+                    loading="lazy"
                 />
             </div>
-            <h2 className="text-lg font-semibold text-white m-auto drop-shadow-2xl">
-                {category}
+            <h2 className="text-sm sm:text-base font-semibold text-white text-center drop-shadow-md group-hover:text-[#1EA6D8] transition-colors">
+                {categoryName}
             </h2>
         </div>
     );

@@ -121,6 +121,7 @@ export default async function ListingPage({ params }: Props) {
                         </div>
                         <h1 className="text-3xl font-bold mb-2 break-words">{listing.title}</h1>
                         <p className="text-3xl font-bold text-[#1EA6D8] mb-6">{formattedPrice}</p>
+
                         <div className="flex flex-col gap-3">
                             {isOwner ? (
                                 <Link
@@ -130,29 +131,24 @@ export default async function ListingPage({ params }: Props) {
                                     Edytuj ogłoszenie
                                 </Link>
                             ) : (
-                                <div className="flex gap-2 items-center justify-center w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg cursor-pointer transition-colors group">
-                                    {session?.user?.id ? (
-                                        <>
-                                            <AddToFavourites
-                                                listingId={listing.id}
-                                                userId={session.user.id}
-                                                isFavourite={isFavourite}
-                                            />
-                                            <span className="font-medium ml-2 group-hover:text-white text-gray-200">
-                                                {isFavourite ? "Usuń z obserwowanych" : "Dodaj do obserwowanych"}
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <Link href="/api/auth/signin" className="text-sm font-medium text-gray-300">
-                                            Zaloguj się, aby obserwować
-                                        </Link>
-                                    )}
-                                </div>
+                                // ZMODYFIKOWANA SEKCJA ULUBIONYCH
+                                session?.user?.id ? (
+                                    <AddToFavourites
+                                        listingId={listing.id}
+                                        userId={session.user.id}
+                                        isFavourite={isFavourite}
+                                        withText={true}
+                                        className="w-full bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white py-3 rounded-lg font-medium transition-colors group"
+                                    />
+                                ) : (
+                                    <Link
+                                        href="/api/auth/signin"
+                                        className="w-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-center py-3 rounded-lg font-medium transition-colors"
+                                    >
+                                        Zaloguj się, aby obserwować
+                                    </Link>
+                                )
                             )}
-
-                            <button className="w-full border-2 border-[#1EA6D8] text-[#1EA6D8] hover:bg-[#1EA6D8] hover:text-white py-3 rounded-lg font-bold transition-colors">
-                                Wyślij wiadomość
-                            </button>
                         </div>
                     </div>
                     <div className="bg-[#3A3335] p-6 rounded-xl border border-[#4A4345] shadow-xl">
@@ -182,11 +178,7 @@ export default async function ListingPage({ params }: Props) {
                     <div className="bg-[#3A3335] p-6 rounded-xl border border-[#4A4345] shadow-xl">
                         <h3 className="text-lg font-semibold mb-2">Lokalizacja</h3>
                         <p className="text-gray-300 mb-4">Rzeszów, Podkarpackie</p>
-                        <div className="w-full h-32 bg-gray-700 rounded-lg flex items-center justify-center text-gray-500 text-sm">
-                            [Mapa Google Placeholder]
-                        </div>
                     </div>
-
                 </div>
             </div>
         </div>

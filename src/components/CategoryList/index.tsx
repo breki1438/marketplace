@@ -17,7 +17,7 @@ export type CategoryWithSubs = {
 };
 
 interface CategoryListProps {
-    categories: CategoryWithSubs[]; // Odbieramy dane jako props
+    categories: CategoryWithSubs[];
 }
 
 export default function CategoryList({ categories }: CategoryListProps) {
@@ -27,10 +27,36 @@ export default function CategoryList({ categories }: CategoryListProps) {
     const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
 
     const handleClick = (e: React.MouseEvent, category: CategoryWithSubs) => {
-        const rect = (e.target as HTMLElement).getBoundingClientRect();
+        const target = e.currentTarget as HTMLElement;
+        const rect = target.getBoundingClientRect();
 
         setActiveCategory((prev) => (prev?.id === category.id ? null : category));
-        setMenuPosition({ x: rect.right + 10, y: rect.top });
+
+        const viewportWidth = window.innerWidth;
+        const isMobile = viewportWidth < 768;
+
+        const estimatedSubmenuWidth = 250;
+
+        let xPos = 0;
+        let yPos = 0;
+
+        if (isMobile) {
+            xPos = rect.left;
+            yPos = rect.bottom + 10;
+        } else {
+            const spaceOnRight = viewportWidth - rect.right;
+
+            if (spaceOnRight < estimatedSubmenuWidth) {
+                xPos = rect.left - estimatedSubmenuWidth - 10;
+            } else {
+                xPos = rect.right + 10;
+            }
+            yPos = rect.top;
+        }
+
+        if (xPos < 10) xPos = 10;
+
+        setMenuPosition({ x: xPos + window.scrollX, y: yPos + window.scrollY });
     };
 
     useEffect(() => {
@@ -44,20 +70,24 @@ export default function CategoryList({ categories }: CategoryListProps) {
     }, []);
 
     return (
-        <div className="relative flex flex-col items-center justify-center p-4 bg-[#2C2628] min-h-[calc(100vh-56px)] top-0">
-            <div className="bg-[#3A3335] p-4 rounded-xl drop-shadow-lg">
-                <h1 className="text-2xl text-center font-bold mb-8 text-white">Kategorie</h1>
+        <div className="relative flex flex-col items-center justify-center py-8 px-4 w-full">
+            <div className="w-full max-w-6xl bg-[#3A3335] p-6 sm:p-8 rounded-2xl shadow-xl border border-white/5">
+                <h1 className="text-2xl sm:text-3xl text-center font-bold mb-8 text-white tracking-wide">
+                    Kategorie
+                </h1>
 
-                <div className="grid grid-cols-6 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 sm:gap-8">
                     {categories.map((category) => (
                         <CategoryCard
                             key={category.id}
-                            category={category.name}
+                            categoryName={category.name}
+                            iconName={category.icon}
                             onClick={(e) => handleClick(e, category)}
                         />
                     ))}
                 </div>
             </div>
+
             {activeCategory && activeCategory.subcategories.length > 0 && menuPosition && (
                 <Submenu
                     ref={submenuRef}

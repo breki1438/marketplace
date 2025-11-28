@@ -7,6 +7,8 @@ type Props = {
     listingId: number;
     userId: string;
     isFavourite: boolean;
+    className?: string;
+    withText?: boolean;
 };
 
 function HeartIcon({ filled }: { filled: boolean }) {
@@ -15,12 +17,12 @@ function HeartIcon({ filled }: { filled: boolean }) {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="white"
+            stroke="currentColor"
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
             className={`w-6 h-6 transition-all duration-300 hover:scale-110 ${
-                filled ? "fill-white" : "fill-transparent"
+                filled ? "fill-current" : "fill-transparent"
             }`}
         >
             <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z" />
@@ -28,7 +30,7 @@ function HeartIcon({ filled }: { filled: boolean }) {
     );
 }
 
-export default function AddToFavourites({ listingId, userId, isFavourite: initialIsFavourite }: Props) {
+export default function AddToFavourites({listingId, userId, isFavourite: initialIsFavourite, className = "", withText = false}: Props) {
     const [isFavourite, setIsFavourite] = useState(initialIsFavourite);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -52,9 +54,7 @@ export default function AddToFavourites({ listingId, userId, isFavourite: initia
                 body: JSON.stringify({ listingId }),
             });
 
-            if (!res.ok) {
-                throw new Error("Błąd API");
-            }
+            if (!res.ok) throw new Error("Błąd API");
 
             router.refresh();
 
@@ -67,15 +67,23 @@ export default function AddToFavourites({ listingId, userId, isFavourite: initia
         }
     }
 
+    const buttonClass = className
+        ? className
+        : "cursor-pointer focus:outline-none disabled:opacity-50 transition-opacity text-white";
+
     return (
         <button
             onClick={handleToggleFavourite}
             disabled={isLoading}
-            className="cursor-pointer focus:outline-none disabled:opacity-50 transition-opacity"
+            className={`flex items-center justify-center gap-2 ${buttonClass}`}
             aria-label={isFavourite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
-            title={isFavourite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
         >
             <HeartIcon filled={isFavourite} />
+            {withText && (
+                <span className="font-medium">
+                    {isFavourite ? "Usuń z obserwowanych" : "Dodaj do obserwowanych"}
+                </span>
+            )}
         </button>
     );
 }
