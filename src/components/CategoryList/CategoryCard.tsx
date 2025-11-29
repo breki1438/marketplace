@@ -19,7 +19,7 @@ export default function CategoryCard({ categoryName, iconName, onClick }: Catego
                 <img
                     src={iconUrl}
                     alt={categoryName}
-                    className="w-3/4 h-3/4 object-contain transition-transform duration-300 group-hover:scale-110"
+                    className="w-3/4 h-3/4 object-contain transition-transform duration-300 group-hover:scale-110 p-1"
                     loading="lazy"
                 />
             </div>

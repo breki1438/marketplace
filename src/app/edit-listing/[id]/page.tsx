@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, ChangeEvent, use } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
@@ -13,6 +13,8 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
     const router = useRouter();
 
     const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [city, setCity] = useState("");
     const [price, setPrice] = useState("");
 
     const [categories, setCategories] = useState<Category[]>([]);
@@ -29,12 +31,13 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
                 const cats = await catRes.json();
                 setCategories(cats);
 
-                const listingRes = await fetch(`/api/listings?id=${id}`);
                 const listingDataRes = await fetch(`/api/listings/${id}`);
                 const listing = await listingDataRes.json();
 
                 if (listing) {
                     setTitle(listing.title);
+                    setDescription(listing.description);
+                    setCity(listing.city);
                     setPrice(listing.price.toString());
                     setSelectedCategoryId(listing.categoryId);
 
@@ -63,6 +66,8 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 title,
+                description,
+                city,
                 price,
                 categoryId: selectedCategoryId,
                 subCategoryId: selectedSubCategoryId
@@ -90,18 +95,38 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
                 className="p-2 rounded bg-[#2C2628] border border-gray-600"
             />
 
-            <label>Cena</label>
-            <input
-                type="number"
-                value={price}
-                onChange={e => setPrice(e.target.value)}
-                className="p-2 rounded bg-[#2C2628] border border-gray-600"
+            <label>Opis</label>
+            <textarea
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                rows={4}
+                className="p-2 rounded bg-[#2C2628] border border-gray-600 resize-none"
             />
+
+            <div className="flex gap-4">
+                <div className="w-1/2">
+                    <label>Miasto</label>
+                    <input
+                        value={city}
+                        onChange={e => setCity(e.target.value)}
+                        className="p-2 w-full rounded bg-[#2C2628] border border-gray-600"
+                    />
+                </div>
+                <div className="w-1/2">
+                    <label>Cena</label>
+                    <input
+                        type="number"
+                        value={price}
+                        onChange={e => setPrice(e.target.value)}
+                        className="p-2 w-full rounded bg-[#2C2628] border border-gray-600"
+                    />
+                </div>
+            </div>
 
             <label>Kategoria</label>
             <select
                 value={selectedCategoryId}
-                onChange={(e) => alert("Zmiana kategorii wymaga przeładowania podkategorii (logika z AddListingForm)")}
+                onChange={() => alert("Zmiana kategorii wymaga przeładowania podkategorii (logika z AddListingForm)")}
                 className="p-2 rounded bg-[#2C2628] border border-gray-600"
                 disabled
             >

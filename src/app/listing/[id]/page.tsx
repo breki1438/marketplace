@@ -42,7 +42,7 @@ export default async function ListingPage({ params }: Props) {
         where: { id: numericId },
         include: {
             user: {
-                select: { id: true, name: true, email: true, image: true }
+                select: { id: true, name: true, email: true, image: true, createdAt: true }
             },
             category: { select: { name: true, slug: true } },
             subCategory: { select: { name: true, slug: true } },
@@ -69,6 +69,10 @@ export default async function ListingPage({ params }: Props) {
         currency: 'PLN',
         maximumFractionDigits: 0
     }).format(listing.price);
+
+    const userJoinedYear = listing.user?.createdAt
+        ? new Date(listing.user.createdAt).getFullYear()
+        : new Date().getFullYear();
 
     return (
         <div className="flex flex-col items-center bg-[#2C2628] p-4 md:p-8 min-h-screen text-white">
@@ -108,12 +112,11 @@ export default async function ListingPage({ params }: Props) {
                     <div className="bg-[#3A3335] p-6 rounded-xl border border-[#4A4345] shadow-xl">
                         <h2 className="text-xl font-bold mb-4 border-b border-gray-600 pb-2">Opis</h2>
                         <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                            To jest przykładowy opis, ponieważ w bazie danych jeszcze nie ma pola description.
+                            {listing.description}
                         </p>
                     </div>
                 </div>
+
                 <div className="space-y-6">
                     <div className="bg-[#3A3335] p-6 rounded-xl border border-[#4A4345] shadow-xl">
                         <div className="text-sm text-gray-400 mb-2">
@@ -131,26 +134,27 @@ export default async function ListingPage({ params }: Props) {
                                     Edytuj ogłoszenie
                                 </Link>
                             ) : (
-                                // ZMODYFIKOWANA SEKCJA ULUBIONYCH
-                                session?.user?.id ? (
-                                    <AddToFavourites
-                                        listingId={listing.id}
-                                        userId={session.user.id}
-                                        isFavourite={isFavourite}
-                                        withText={true}
-                                        className="w-full bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white py-3 rounded-lg font-medium transition-colors group"
-                                    />
-                                ) : (
-                                    <Link
-                                        href="/api/auth/signin"
-                                        className="w-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-center py-3 rounded-lg font-medium transition-colors"
-                                    >
-                                        Zaloguj się, aby obserwować
-                                    </Link>
-                                )
+                                <div className="flex gap-2 items-center justify-center w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg cursor-pointer transition-colors group">
+                                    {session?.user?.id ? (
+                                        <>
+                                            <AddToFavourites
+                                                listingId={listing.id}
+                                                userId={session.user.id}
+                                                isFavourite={isFavourite}
+                                                withText={true}
+                                                className="w-full bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white py-3 rounded-lg font-medium transition-colors"
+                                            />
+                                        </>
+                                    ) : (
+                                        <Link href="/api/auth/signin" className="text-sm font-medium text-gray-300">
+                                            Zaloguj się, aby obserwować
+                                        </Link>
+                                    )}
+                                </div>
                             )}
                         </div>
                     </div>
+
                     <div className="bg-[#3A3335] p-6 rounded-xl border border-[#4A4345] shadow-xl">
                         <h3 className="text-lg font-semibold mb-4">Sprzedający</h3>
                         <div className="flex items-center gap-4">
@@ -167,7 +171,7 @@ export default async function ListingPage({ params }: Props) {
                             )}
                             <div>
                                 <p className="font-bold text-lg">{listing.user?.name || "Użytkownik"}</p>
-                                <p className="text-sm text-gray-400">Na MarketPlace od 2025</p>
+                                <p className="text-sm text-gray-400">Na MarketPlace od {userJoinedYear}</p>
                             </div>
                         </div>
                         <div className="mt-6 pt-4 border-t border-gray-600">
@@ -175,9 +179,10 @@ export default async function ListingPage({ params }: Props) {
                             <p className="font-medium">{listing.user?.email || "Ukryty"}</p>
                         </div>
                     </div>
+
                     <div className="bg-[#3A3335] p-6 rounded-xl border border-[#4A4345] shadow-xl">
                         <h3 className="text-lg font-semibold mb-2">Lokalizacja</h3>
-                        <p className="text-gray-300 mb-4">Rzeszów, Podkarpackie</p>
+                        <p className="text-gray-300">{listing.city}</p>
                     </div>
                 </div>
             </div>

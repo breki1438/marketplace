@@ -19,7 +19,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             include: {
                 category: { select: { name: true, slug: true } },
                 subCategory: { select: { name: true, slug: true } },
-                user: { select: { name: true, image: true, email: true } }
+                user: {
+                    select: {
+                        name: true,
+                        image: true,
+                        email: true,
+                        createdAt: true
+                    }
+                }
             }
         });
 
@@ -83,9 +90,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     try {
         const body = await request.json();
-        const { title, price, categoryId, subCategoryId } = body;
+        const { title, description, city, price, categoryId, subCategoryId } = body;
 
-        if (!title || !price || !categoryId) {
+        if (!title || !description || !city || !price || !categoryId) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
@@ -104,6 +111,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
             where: { id: listingId },
             data: {
                 title,
+                description,
+                city,
                 price: parseFloat(price),
                 categoryId,
                 subCategoryId

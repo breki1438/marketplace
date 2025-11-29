@@ -12,6 +12,7 @@ interface ListingListProps {
     categoryName?: string;
     subcategoryName?: string;
     initialListings?: ListingItem[];
+    initialFavouriteIds?: number[];
 }
 
 const formatSlug = (slug: string) => {
@@ -25,13 +26,14 @@ export default function ListingList({
                                         subcategorySlug,
                                         categoryName,
                                         subcategoryName,
-                                        initialListings = []
+                                        initialListings = [],
+                                        initialFavouriteIds = []
                                     }: ListingListProps) {
     const { data: session } = useSession();
 
     const [listings, setListings] = useState<ListingItem[]>(initialListings);
     const [quickAccessItems, setQuickAccessItems] = useState<any[]>([]);
-    const [favouritesIds, setFavouritesIds] = useState<number[]>([]);
+    const [favouritesIds, setFavouritesIds] = useState<number[]>(initialFavouriteIds);
 
     const [minPriceFilter, setMinPriceFilter] = useState<number | null>(null);
     const [maxPriceFilter, setMaxPriceFilter] = useState<number | null>(null);
@@ -98,6 +100,7 @@ export default function ListingList({
             setFavouritesIds([]);
             return;
         }
+
         async function fetchFavourites() {
             try {
                 const res = await fetch(`/api/user-favourites`);

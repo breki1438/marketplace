@@ -4,6 +4,7 @@ import AddToFavourites from "./AddToFavourites";
 export interface ListingItem {
     id: number;
     title: string;
+    city: string;
     price: number;
     imageUrl: string | null;
     userId: string;
@@ -71,7 +72,7 @@ export default function ListingCard({ listing, currentUserId, isFavourite, onDel
                             {formattedPrice}
                         </p>
                         <div className="flex items-center text-[#A6A6A6] text-xs sm:text-sm gap-2">
-                            <span>Rzeszów</span>
+                            <span>{listing.city}</span>
                             <span className="w-1 h-1 rounded-full bg-gray-500"></span>
                             <span>{formattedDate}</span>
                         </div>

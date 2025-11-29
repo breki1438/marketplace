@@ -42,11 +42,12 @@ export async function GET(request: Request) {
             select: {
                 id: true,
                 title: true,
+                description: true,
+                city: true,
                 price: true,
                 imageUrl: true,
                 userId: true,
                 createdAt: true,
-                // Relacje:
                 category: {
                     select: { name: true, slug: true }
                 },
@@ -54,7 +55,7 @@ export async function GET(request: Request) {
                     select: { name: true, slug: true }
                 },
                 user: {
-                    select: { name: true, image: true } // Przyda się, by pokazać kto sprzedaje
+                    select: { name: true, image: true }
                 }
             }
         });
@@ -69,15 +70,17 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { title, price, imageUrl, userId, categoryId, subCategoryId } = body;
+        const { title, description, city, price, imageUrl, userId, categoryId, subCategoryId } = body;
 
-        if (!title || !price || !userId || !categoryId || !subCategoryId) {
+        if (!title || !description || !city || !price || !userId || !categoryId || !subCategoryId) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
         const newListing = await prisma.listing.create({
             data: {
                 title,
+                description,
+                city,
                 price: parseFloat(price),
                 imageUrl,
                 userId,

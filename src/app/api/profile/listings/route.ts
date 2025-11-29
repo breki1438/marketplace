@@ -18,6 +18,7 @@ export async function GET(request: Request) {
         const selectFields = {
             id: true,
             title: true,
+            city: true,
             price: true,
             imageUrl: true,
             userId: true,
